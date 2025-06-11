@@ -1,23 +1,9 @@
-obf_copyright := " Date: 8:45 AM June 8, 2025                     "
-obf_copyright := "                                                "
-obf_copyright := " THE FOLLOWING AUTOHOTKEY SCRIPT WAS OBFUSCATED "
-obf_copyright := " BY DYNAMIC OBFUSCATOR L FOR AUTOHOTKEY         "
-obf_copyright := " By DigiDon                                     "
-obf_copyright := "                                                "
-obf_copyright := " Based on DYNAMIC OBFUSCATOR                    "
-obf_copyright := " Copyright (C) 2011-2013  David Malia           "
-obf_copyright := " DYNAMIC OBFUSCATOR is released under           "
-obf_copyright := " the Open Source GPL License                    "
-;autoexecute
-#SingleInstance, Force
-#NoEnv
 SetWorkingDir %A_ScriptDir%
 #WinActivateForce
 SetMouseDelay, -1
 SetWinDelay, -1
 SetControlDelay, -1
 SetBatchLines, -1
-EnvGet, LOCAL_COMPUTER_NAME, ComputerName
 global WEB_APP_URL := "https://script.google.com/macros/s/AKfycbyaY3CJTgG2ZV3HxY6d30K3t-PAhJKCVeJU9RSAziSoAmxBiWhY06ATUVDQJ2z39S_-/exec"
 global webhookURL
 global privateServerLink
