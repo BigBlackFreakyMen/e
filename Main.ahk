@@ -17,8 +17,6 @@ SetMouseDelay, -1
 SetWinDelay, -1
 SetControlDelay, -1
 SetBatchLines, -1
-global VERIFIED_KEY := "VerifiedUser"
-global GAME_PASS_IDS := [1244038348, 1222540123, 1222262383, 1222306189, 1220930414]
 EnvGet, LOCAL_COMPUTER_NAME, ComputerName
 global WEB_APP_URL := "https://script.google.com/macros/s/AKfycbyaY3CJTgG2ZV3HxY6d30K3t-PAhJKCVeJU9RSAziSoAmxBiWhY06ATUVDQJ2z39S_-/exec"
 global webhookURL
