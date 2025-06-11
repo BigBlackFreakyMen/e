@@ -1,9 +1,26 @@
+obf_copyright := " Date: 8:45 AM June 8, 2025                     "
+obf_copyright := "                                                "
+obf_copyright := " THE FOLLOWING AUTOHOTKEY SCRIPT WAS OBFUSCATED "
+obf_copyright := " BY DYNAMIC OBFUSCATOR L FOR AUTOHOTKEY         "
+obf_copyright := " By DigiDon                                     "
+obf_copyright := "                                                "
+obf_copyright := " Based on DYNAMIC OBFUSCATOR                    "
+obf_copyright := " Copyright (C) 2011-2013  David Malia           "
+obf_copyright := " DYNAMIC OBFUSCATOR is released under           "
+obf_copyright := " the Open Source GPL License                    "
+;autoexecute
+#SingleInstance, Force
+#NoEnv
 SetWorkingDir %A_ScriptDir%
 #WinActivateForce
 SetMouseDelay, -1
 SetWinDelay, -1
 SetControlDelay, -1
 SetBatchLines, -1
+global VERIFIED_KEY := "VerifiedUser"
+global GAME_PASS_IDS := [1244038348, 1222540123, 1222262383, 1222306189, 1220930414]
+EnvGet, LOCAL_COMPUTER_NAME, ComputerName
+global WEB_APP_URL := "https://script.google.com/macros/s/AKfycbyaY3CJTgG2ZV3HxY6d30K3t-PAhJKCVeJU9RSAziSoAmxBiWhY06ATUVDQJ2z39S_-/exec"
 global webhookURL
 global privateServerLink
 global discordUserID
@@ -685,7 +702,182 @@ honeyItems := ["Flower Seed Pack", "placeHolder1", "Lavender Seed", "Nectarshade
 realHoneyItems := ["Flower Seed Pack", "Lavender Seed", "Nectarshade Seed", "Nectarine Seed", "Hive Fruit Seed", "Pollen Rader", "Nectar Staff"
 , "Honey Sprinkler", "Bee Egg", "Bee Crate", "Honey Comb", "Bee Chair", "Honey Torch", "Honey Walkway"]
 settingsFile := A_ScriptDir "\settings.ini"
+VerifyOwnership()
+Return
+VerifyOwnership()
+{
+    global GAME_PASS_ID, WEB_APP_URL, VERIFIED_KEY, settingsFile
+    savedUser := LoadVerifiedUser()
+    if (savedUser <> "") {
+        userId := GetUserId(savedUser)
+        if (userId && OwnsGamepass(userId, GAME_PASS_ID)) {
+            EnvGet, compName, ComputerName
+            encodedUser := URLEncode(savedUser)
+            encodedPC   := URLEncode(compName)
+            fullURL := WEB_APP_URL . "?username=" . encodedUser . "&computer=" . encodedPC
+            HttpObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+            HttpObj.Open("GET", fullURL, false)
+            HttpObj.Send()
+            status := HttpObj.Status
+            response := HttpObj.ResponseText           
+            if (status != 200) {
+                MsgBox, 16, HTTP Error, Failed to contact the web app.nHTTP Status: %status%
+                ExitApp
+            }
+            if (InStr(response, """exists"":true") && InStr(response, """matched"":true")) {
+                MsgBox, 64, Welcome Back %savedUser%!, User "%savedUser%" is already verified on this PC.
+                Gosub, @fff@fkk@fffffkkkf@kf@@f#kkk
+                Return
+            } else {
+                DeleteVerifiedUser()
+            }
+        } else {
+            DeleteVerifiedUser()
+        }
+    }
+    Gosub, CombinedVerify
+    Return
+}
+LoadVerifiedUser()
+{
+    global settingsFile, VERIFIED_KEY
+    IniRead, uname, %settingsFile%, Main, %VERIFIED_KEY%, 
+    return Trim(uname)
+}
+SaveVerifiedUser(username)
+{
+    global settingsFile, VERIFIED_KEY
+    IniWrite, %username%, %settingsFile%, Main, %VERIFIED_KEY%
+}
+DeleteVerifiedUser()
+{
+    global settingsFile, VERIFIED_KEY
+    IniWrite, %A_Space%, %settingsFile%, Main, %VERIFIED_KEY%
+}
+CombinedVerify:
+{
+    global GAME_PASS_ID, WEB_APP_URL, VERIFIED_KEY, settingsFile
+    InputBox, username, Verify Premium Macro, Enter your Roblox username:, , 300, 130
+    if (ErrorLevel)
+        ExitApp
+    username := Trim(username)
+    if (username = "") {
+        MsgBox, 48, Error, You must enter a non‐empty username.
+        ExitApp
+    }
+    userId := GetUserId(username)
+    if (!userId)
+        ExitApp
+    hasPass := false
+for _, gpId in GAME_PASS_IDS {
+    if OwnsGamepass(userId, gpId) {
+        hasPass := true
+        break
+    }
+}
+    if (!hasPass) {
+        MsgBox, 48, Does Not Own, User '%username%' (ID %userId%) does NOT own GamePass %GAME_PASS_ID%.nMake sure inventory is public or the pass is purchased.
+        ExitApp
+    }
+    EnvGet, compName, ComputerName
+    encodedUser := URLEncode(username)
+    encodedPC   := URLEncode(compName)
+    fullURL := WEB_APP_URL . "?username=" . encodedUser . "&computer=" . encodedPC
+    HttpObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    HttpObj.Open("GET", fullURL, false)
+    HttpObj.Send()
+    status := HttpObj.Status
+    responseText := HttpObj.ResponseText
+    if (status != 200) {
+        MsgBox, 16, HTTP Error, Failed to contact the web app.nHTTP Status: %status%
+        ExitApp
+    }
+    if InStr(responseText, """exists"":true") && InStr(responseText, """matched"":false") {
+        MsgBox, 48, Sheet Check, Username %username% is already registered on a different PC. Access denied.
+        ExitApp
+    }
+    else if InStr(responseText, """exists"":false") {
+        MsgBox, 64, Sheet Check, Successfully registered %username% on this PC! Welcome!
+    }
+    else if InStr(responseText, """exists"":true") && InStr(responseText, """matched"":true") {
+        MsgBox, 64, Sheet Check, %username% already registered on this PC. Welcome back!
+    }
+    else {
+        MsgBox, 16, Unexpected Response, Got unexpected JSON from Sheet check:n%responseText%
+        ExitApp
+    }
+    SaveVerifiedUser(username)
+    MsgBox, 64, Verified!, User '%username%' verified. Loading main GUI...
+    Gosub, @fff@fkk@fffffkkkf@kf@@f#kkk
+Return
+}
+GetUserId(username)
+{
+    global
+    USERNAME_LOOKUP_URL := "https://users.roblox.com/v1/usernames/users"
+    payload := "{""usernames"":[""" username """],""excludeBannedUsers"":true}"
+    http := ComObjCreate("MSXML2.XMLHTTP")
+    http.Open("POST", USERNAME_LOOKUP_URL, false)
+    http.SetRequestHeader("Content-Type", "application/json")
+    http.Send(payload)
+    if (http.Status != 200)
+    {
+        MsgBox, 16, Network Error, % "Failed to reach Roblox user lookup API.nStatus: " . http.Status
+        return 0
+    }
+    resp := http.responseText
+    if RegExMatch(resp, """id"":\s*(\d+)", m)
+        return m1
 
+    MsgBox, 16, User Not Found, Username '%username%' not found.
+    return 0
+}
+OwnsGamepass(userId, gamePassId)
+{
+    global
+    GAMEPASS_OWNERSHIP_URL := "https://inventory.roblox.com/v1/users/%userId%/items/GamePass/%gamePassId%"
+    url := StrReplace(GAMEPASS_OWNERSHIP_URL, "%userId%", userId)
+    url := StrReplace(url, "%gamePassId%", gamePassId)
+    http := ComObjCreate("MSXML2.XMLHTTP")
+    http.Open("GET", url, false)
+    http.Send()
+    if (http.Status != 200)
+        return false
+    resp := http.responseText
+    if InStr(resp, """data"":[]")
+        return false
+    return true
+}
+URLEncode(str)
+{
+    static chars := "0123456789ABCDEF"
+    VarSetCapacity(out, StrLen(str)*3, 0)
+    j := 0
+    Loop, Parse, str
+    {
+        asc := Asc(A_LoopField)
+        if ( (asc >= 48 && asc <= 57)      ; 0-9
+            || (asc >= 65 && asc <= 90)   ; A-Z
+            || (asc >= 97 && asc <= 122)  ; a-z
+            || asc = 45 || asc = 46        ; - .
+            || asc = 95 || asc = 126 )    ; _ ~
+        {
+            out .= Chr(asc)
+        }
+        else if (asc == 32)  ; space → “+”
+        {
+            out .= "+"
+        }
+        else
+        {
+            ; Percent‐encode everything else
+            hi := asc >> 4
+            lo := asc & 0xF
+            out .= "%" . SubStr(chars, hi+1, 1) . SubStr(chars, lo+1, 1)
+        }
+    }
+    return out
+}
 @fff@fkk@fffffkkkf@kf@@f#kkk:
 Gui, Destroy
 Gui, +Resize +MinimizeBox +SysMenu
