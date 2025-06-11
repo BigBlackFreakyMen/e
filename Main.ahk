@@ -4,7 +4,6 @@ SetMouseDelay, -1
 SetWinDelay, -1
 SetControlDelay, -1
 SetBatchLines, -1
-global WEB_APP_URL := "https://script.google.com/macros/s/AKfycbyaY3CJTgG2ZV3HxY6d30K3t-PAhJKCVeJU9RSAziSoAmxBiWhY06ATUVDQJ2z39S_-/exec"
 global webhookURL
 global privateServerLink
 global discordUserID
